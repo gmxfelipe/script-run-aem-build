@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
-
+ 
 set AEM_JAR_PATH=C:/Users/felipe.o/projeto-cloud-service/servers/author/aem-sdk/aem-author-p4502.jar
 set CRX_DIR=C:/Users/felipe.o/projeto-cloud-service/servers/author/aem-sdk/crx-quickstart
  
