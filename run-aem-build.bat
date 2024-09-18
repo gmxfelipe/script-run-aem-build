@@ -1,9 +1,24 @@
 @echo off
 setlocal EnableDelayedExpansion
- 
-set AEM_JAR_PATH=C:/Users/felipe.o/projeto-cloud-service/servers/author/aem-sdk/aem-author-p4502.jar
-set CRX_DIR=C:/Users/felipe.o/projeto-cloud-service/servers/author/aem-sdk/crx-quickstart
- 
+
+rem Chama o script PowerShell para selecionar o arquivo JAR
+echo Por favor, selecione o arquivo JAR necessario para iniciar o AEM
+for /f "delims=" %%i in ('powershell -ExecutionPolicy Bypass -File SelectFolder.ps1 -type file') do set AEM_JAR_PATH=%%i
+if not defined AEM_JAR_PATH (
+    echo Nenhum arquivo JAR foi selecionado. Saindo do script
+    goto end
+)
+echo Caminho do arquivo JAR selecionado: %AEM_JAR_PATH%
+
+rem Chama o script PowerShell para selecionar a pasta CRX
+echo Agora, selecione a pasta CRX que sera usada pelo AEM
+for /f "delims=" %%i in ('powershell -ExecutionPolicy Bypass -File SelectFolder.ps1 -type folder') do set CRX_DIR=%%i
+if not defined CRX_DIR (
+    echo Nenhuma pasta CRX foi selecionada. Saindo do script
+    goto end
+)
+echo Caminho da pasta CRX selecionada: %CRX_DIR%
+
 set PROJECT1_URL=https://telefonica-vivo-brasil@dev.azure.com/telefonica-vivo-brasil/ADBB%%20-%%20ADOBE%%20EXPERIENCE%%20MANAGER%%20B2B/_git/aem-telco
 set PROJECT2_URL=https://telefonica-vivo-brasil@dev.azure.com/telefonica-vivo-brasil/ADBB%%20-%%20ADOBE%%20EXPERIENCE%%20MANAGER%%20B2B/_git/aem-meu-vivo
 set PROJECT3_URL=https://telefonica-vivo-brasil@dev.azure.com/telefonica-vivo-brasil/ADBB%%20-%%20ADOBE%%20EXPERIENCE%%20MANAGER%%20B2B/_git/aem-equipamentos-presencial
@@ -28,10 +43,20 @@ set COMMON_DIR=%USERPROFILE%\projetos-vivo-script\aem-common
 if exist "%PROJECTS_DIR%" (
     echo A pasta de projetos ja existe. Removendo.
     rmdir /S /Q "%PROJECTS_DIR%"
+    if errorlevel 1 (
+        echo Falha ao remover a pasta de projetos. Verifique as permissoes e tente novamente.
+    ) else (
+        echo Pasta de projetos removida com sucesso.
+    )
 )
 
 echo Criando a pasta de projetos.
 mkdir "%PROJECTS_DIR%"
+if errorlevel 1 (
+    echo Falha ao criar a pasta de projetos. Verifique as permissoes e tente novamente.
+) else (
+    echo Pasta de projetos criada com sucesso.
+)
 
 if not exist "%CRX_DIR%" (
     echo Diretorio CRX nao existe. Pulando para o passo de iniciar o AEM.
@@ -46,6 +71,7 @@ if errorlevel 1 (
 ) else (
     echo Diretorio CRX apagado com sucesso.
 )
+
 
 :StartAEM
 echo Iniciando AEM.
